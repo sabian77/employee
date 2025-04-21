@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Job extends Model
 {
@@ -20,13 +21,13 @@ class Job extends Model
     ];
 
     // Many-to-One
-    public function employee()
+    public function employee(): BelongsTo
     {
-        return $this->belongsTo(Employee::class);
+        return $this->belongsTo(Employee::class, 'karyawan_id');
     }
 
     // Many-to-One
-    public function division()
+    public function division(): BelongsTo
     {
         return $this->belongsTo(Division::class, 'divisi_id');
     }

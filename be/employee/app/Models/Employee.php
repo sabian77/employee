@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Employee extends Model
 {
@@ -33,9 +34,20 @@ class Employee extends Model
     }
 
     // One-to-One
-    public function Job()
+    public function job(): HasOne
     {
-        return $this->hasmany(Job::class);
+        return $this->hasOne(Job::class, 'karyawan_id');
     }
 
+    public function division()
+    {
+        return $this->hasOneThrough(
+            Division::class,
+            Job::class,
+            'karyawan_id', // Foreign key on jobs table...
+            'id', // Foreign key on divisions table...
+            'id', // Local key on employees table...
+            'divisi_id' // Local key on jobs table...
+        );
+    }
 }

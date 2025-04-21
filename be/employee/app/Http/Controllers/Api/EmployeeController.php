@@ -8,37 +8,13 @@ use App\Http\Resources\BaseResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
 
 class EmployeeController extends Controller
 {
     // Get employees list
     public function index(Request $request)
     {
-        // $query = Employee::select(
-        //     'karyawan.id',
-        //     'karyawan.nik',
-        //     'karyawan.nama_lengkap',
-        //     'karyawan.tempat_lahir',
-        //     'karyawan.tanggal_lahir',
-        //     'karyawan.jenis_kelamin',
-        //     'karyawan.email',
-        //     'karyawan.telepon',
-        //     'karyawan.alamat',
-        //     'karyawan.status',
-        //     'divisi.nama_divisi',
-        //     'jabatan.nama_jabatan',
-        //     'pekerjaan.tanggal_bergabung'
-        // )
-        //     ->leftJoin('pekerjaan', 'karyawan.id', '=', 'pekerjaan.karyawan_id')
-        //     ->leftJoin('divisi', 'pekerjaan.divisi_id', '=', 'divisi.id')
-        //     ->leftJoin('jabatan', 'pekerjaan.jabatan_id', '=', 'jabatan.id');
-
-        // Filter by division
-        // if ($request->has('division_id')) {
-        //     $query->where('pekerjaan.divisi_id', $request->division_id);
-        // }
-
-        //return new BaseResource(true, 'Employee list', $query->paginate(5));
 
         $employee = Employee::latest()->paginate(5);
 
@@ -184,5 +160,26 @@ class EmployeeController extends Controller
         })->count();
 
         return new BaseResource(true, 'Employees by division', $employees);
+    }
+
+    // Get employees with division and salary
+    public function getEmployeesWithDivision()
+    {
+        $employees = DB::table('karyawan')
+            ->join('pekerjaan', 'karyawan.id', '=', 'pekerjaan.karyawan_id')
+            ->join('divisi', 'pekerjaan.divisi_id', '=', 'divisi.id')
+            ->select(
+                'karyawan.id',
+                'karyawan.nik',
+                'karyawan.nama_lengkap',
+                'karyawan.email',
+                'karyawan.telepon',
+                'divisi.nama_divisi',
+                'pekerjaan.gaji'
+            )
+            ->orderBy('karyawan.nama_lengkap')
+            ->paginate(10);
+
+        return new BaseResource(true, 'Daftar karyawan dengan divisi dan gaji', $employees);
     }
 }
